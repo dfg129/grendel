@@ -15,7 +15,7 @@ var sourcemaps = require('gulp-sourcemaps');
 var APP_SRC = './app_src';
 var APP_DEPLOY = './dist/public';
 
-var onError = function (err) { 
+var onError = function (err) {
   console.log(err);
   gutil.beep();
 }
@@ -41,11 +41,11 @@ var paths = {
 }
 
 gulp.src(APP_SRC + '/bower_components/angular/angular.js')
-    .pipe(gulp.dest(APP_DEPLOY + '/components/'));
+    .pipe(gulp.dest(APP_DEPLOY + '/js/'));
 gulp.src(APP_SRC + '/bower_components/angular-ui-router/release/angular-ui-router.js')
-    .pipe(gulp.dest(APP_DEPLOY + '/components/'));
+    .pipe(gulp.dest(APP_DEPLOY + '/js/'));
 gulp.src(APP_SRC + '/bower_components/ui-grid.js')
-    .pipe(gulp.dest(APP_DEPLOY + '/components'));
+    .pipe(gulp.dest(APP_DEPLOY + '/js'));
 
 gulp.task('server', function() {
   browserSync({
@@ -53,7 +53,7 @@ gulp.task('server', function() {
       baseDir: APP_DEPLOY
     }
   });
-  
+
   gulp.watch(paths.stylesSrc, ['styles']);
   gulp.watch(paths.cssSrc, ['css']);
   gulp.watch(paths.imagesSrc, ['images']);

@@ -1,9 +1,22 @@
 // declare module
 
-var appModule = angular.module('grendel', []);
+var appModule = angular.module('grendel', ['ui-router']);
 
-appModule.filter('greet', function() {
-  return function(name) {
-    return 'This is my ' + name;
-  };
+appModule.config(function($stateProvider, $urlRouteProvider) {
+  $stateProvider
+    .state('settings', {
+      url: '/settings',
+      templateUrl: 'templates/settings.html'
+    })
+    .state('settings.profile', {
+      url: '/profile',
+      templateUrl: 'templates/profile.html',
+      controller: 'ProfileController'
+    })
+    .state('settings.accoutn', {
+      url: '/account',
+      templateUrl: 'templates/account.html'
+      contrller: 'AccountController'
+    });
+    $urlRouteProvider.otherwise('/settings/profile');
 });
