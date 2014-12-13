@@ -1,9 +1,16 @@
+<html>
+<body>
+
+
 <div ng-app="grendel">
   <div>
-    {{ 'World!' | greet }}
+    <div ui-view></div>
+    <a ui-sref="main">State 1</a>
   </div>
 </div>
 
 <script src="./js/angular.js"></script>
 <script src="./js/angular-ui-router.js"
 <script src="./scripts/grendel.js"> </script>
+</body>
+</html>

@@ -4,19 +4,33 @@ var appModule = angular.module('grendel', ['ui-router']);
 
 appModule.config(function($stateProvider, $urlRouteProvider) {
   $stateProvider
-    .state('settings', {
-      url: '/settings',
-      templateUrl: 'templates/settings.html'
+    .state('main', {
+      url: "/main",
+      templateUrl: "partials/main.html"
     })
-    .state('settings.profile', {
-      url: '/profile',
-      templateUrl: 'templates/profile.html',
-      controller: 'ProfileController'
+    .state('state1', {
+      url: "/state1",
+      templateUrl: "partials/state1.html",
+      controller: 'State1Controller'
     })
-    .state('settings.accoutn', {
-      url: '/account',
-      templateUrl: 'templates/account.html'
-      contrller: 'AccountController'
+    .state('state1.list') {
+      url:"/list"
+      templateUrl:"partials/state1.list.html"
+      controller: function($scope) {
+        $scope.items = ["A", "List", "Of", "Items"];
+      }
+    }
+    .state('state2', {
+      url: "/state2",
+      templateUrl: "partials/state2.html"
+      controller: 'State2Controller';
+    }).
+    state('state2.list', {
+      url:"/list",
+      templateUrl:"partials/state2.list.html",
+      controller: function($scope) {
+        $scope.things = ["A", "Set", "Of", "Things"];
+      }
     });
     $urlRouteProvider.otherwise('/settings/profile');
 });
