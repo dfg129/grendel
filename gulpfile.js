@@ -28,7 +28,7 @@ gulp.task('clean', function (cb) {
 var paths = {
   scriptsSrc: APP_SRC + '/scripts/*.js',
   scriptsDest: APP_DEPLOY + '/scripts/',
-  htmlSrc: APP_SRC + '/index.html',
+  htmlSrc: APP_SRC + '/html/index.html',
   htmlDest: APP_DEPLOY,
   stylesSrc: APP_SRC + '/styles/*.styl',
   stylesDest: APP_DEPLOY + '/css/',
@@ -40,11 +40,11 @@ var paths = {
   traceurSrc: APP_SRC + '/ecma6/*.js'
 }
 
-gulp.src(APP_SRC + '/bower_components/angular/angular.js')
+gulp.src('./bower_components/angularjs/angular.js')
     .pipe(gulp.dest(APP_DEPLOY + '/js/'));
-gulp.src(APP_SRC + '/bower_components/angular-ui-router/release/angular-ui-router.js')
+gulp.src('./bower_components/ui-router/release/angular-ui-router.js')
     .pipe(gulp.dest(APP_DEPLOY + '/js/'));
-gulp.src(APP_SRC + '/bower_components/ui-grid.js')
+gulp.src('./bower_components/ui-grid.js')
     .pipe(gulp.dest(APP_DEPLOY + '/js'));
 
 gulp.task('server', function() {
@@ -58,7 +58,7 @@ gulp.task('server', function() {
   gulp.watch(paths.cssSrc, ['css']);
   gulp.watch(paths.imagesSrc, ['images']);
   gulp.watch(paths.htmlSrc, ['html']);
-  gulp.watch(paths.scriptsSrc, ['lint', 'scripts']);
+  gulp.watch(paths.scriptsSrc, ['lint', 'traceur', 'scripts']);
   gulp.watch(paths.partialsSrc, ['partials']);
   gulp.watch(paths.traceurSrc, ['traceur'])
 });
