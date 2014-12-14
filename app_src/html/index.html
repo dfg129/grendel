@@ -1,16 +1,31 @@
-<html>
-<body>
+<html ng-app="appModule">
+<head>
+  <script src="js/angular.js"></script>
+  <script src="./js/angular-ui-router.js"></script>
+  <script src="./scripts/grendel.js"> </script>
+  <link rel="stylesheet" type="test/css" href="./css/main.css"
+</head>
+<body class="body">
 
+<header class="header">Header</header>
+<div class="app">
 
-<div ng-app="grendel">
-  <div>
+  <nav class="nav">
+    <div class="nav-item nav1">State 1</div>
+    <div class="nav-item nav2">State 2</div>
+    <div class="nav-item nav3">State 3</div>
+  </nav>
+
+  <main class="content">
     <div ui-view></div>
     <a ui-sref="main">Main</a>
-  </div>
+  </main>
+
+  <aside class="sidebar"> </aside>
+
 </div>
 
-<script src="./js/angular.js"></script>
-<script src="./js/angular-ui-router.js"></script>
-<script src="./scripts/grendel.js"> </script>
+<footer class="footer">Footer</footer>
+
 </body>
 </html>
