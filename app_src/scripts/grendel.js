@@ -32,6 +32,18 @@ appModule.config(function($stateProvider, $urlRouterProvider) {
         $scope.things = ["A", "Set", "Of", "Things"];
       }
     })
+    .state('state3', {
+      url: "/state3",
+      templateUrl: "./partials/state3.html",
+      controller: 'State3Controller'
+    })
+    .state('state3.list', {
+      url:"/list",
+      templateUrl:"./partials/state3.list.html",
+      controller: function($scope) {
+        $scope.things = ["A", "Set", "Of", "Things"];
+      }
+    })
 
     $urlRouterProvider.otherwise('/')
   });
