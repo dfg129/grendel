@@ -5,6 +5,7 @@
 .cache/
 .history/
 .lib/
+client/bower_components
 dist/*
 target/
 lib_managed/
