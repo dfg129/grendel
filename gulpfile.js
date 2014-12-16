@@ -12,7 +12,7 @@ var traceur = require('gulp-traceur');
 var sourcemaps = require('gulp-sourcemaps');
 
 
-var APP_SRC = './app_src';
+var APP_SRC = './client/app';
 var APP_DEPLOY = './dist/public';
 
 var onError = function (err) {
