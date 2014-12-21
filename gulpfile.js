@@ -2,9 +2,16 @@
 
 var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
+var opn = require('opn');
 
-gulp.task('csslint', function() {
-  return gulp.src(paths.style.src)
+
+var server = {
+  host: 'localhost',
+  port: '3000'
+};
+
+gulp.task('css', function() {
+  return gulp.src(paths.styles.src)
     .pipe($.csslint({
       ids: false // allow ids in CSS selectors
     }))
@@ -29,26 +36,27 @@ gulp.task('traceur', function() {
       .pipe(filter)
       .pipe($.traceur({
         sourceMap: true
-      })
+      }))
       .pipe(filter.restore())
       .pipe($.concat('app.js'))
       .pipe($.insert.append('System.get("grendel" + "");'))
       .pipe(gulp.dest(paths.scripts.build));
 });
 
-gulp.task('clean', function() {
+gulp.task('rimraf', function() {
   return gulp.src([paths.dest.build, basePaths.deploy], {read: false})
-    .pipe($clean());
-}
+    .pipe($.rimraf());
+});
 
+/*
 gulp.task('connect', function() {
   var connect = require('connect');
+  var serveStatic = require('serve-static');
   var app = connect()
     .use(require('connect-livereload')({
       port: 35729
     }))
-    .use(connect.static('.'))
-    .use(connect.directory('.'));
+    .use(serveStatic(__dirname));
 
     require('http').createServer(app)
       .listen(3000)
@@ -57,26 +65,33 @@ gulp.task('connect', function() {
       });
 });
 
-gulp.task('serve', [connect], function() {
+gulp.task('serve', ['connect'], function() {
   require('opn')('http://localhost:3000');
 });
+*/
 
-gulp.task('watch', ['connect', 'serve'], function() {
-  var server = $livereload();
+gulp.task('webserver', function() {
+  gulp.src('.')
+    .pipe($.webserver({
+      host: server.host,
+      port: server.port,
+      livereload: true,
+      directoryListing: true
+    }));
+});
 
-  gulp.watch([
-    paths.html.src,
-    paths.styles.src,
-    paths.scripts.src
-    ]).on('change', function(file) {
-      server.changed(file.path);
-    });
+gulp.task('openbrowser', function() {
+  opn('http://' + server.host + ':' + server.port);
+});
 
+
+gulp.task('watch', ['webserver', 'openbrowser'], function() {
     gulp.watch([paths.styles.src], ['csslint']);
     gulp.watch([paths.scripts.src], ['jshint', 'traceur'])
 });
 
-gulp.task('default', ['csslint', 'jshint', 'traceur', 'connect', 'watch']);
+
+gulp.task('default', ['css', 'jshint', 'traceur', 'webserver', 'watch', 'openbrowser']);
 
 /*
 var debug = require('gulp-debug');
@@ -92,9 +107,9 @@ var traceur = require('gulp-traceur');
 var sourcemaps = require('gulp-sourcemaps');
 */
 var basePaths = {
-  src: './client/app/',
-  deploy: './dist/public/',
-  build: './client/app/'
+  src: 'client/app/',
+  deploy: 'dist/public/',
+  build: 'client/app/'
 }
 
 var paths = {
