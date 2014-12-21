@@ -1,20 +1,123 @@
 'use strict'
 
 var gulp = require('gulp');
+var $ = require('gulp-load-plugins')();
+
+gulp.task('csslint', function() {
+  return gulp.src(paths.style.src)
+    .pipe($.csslint({
+      ids: false // allow ids in CSS selectors
+    }))
+    .pipe($.csslint.reporter());
+});
+
+gulp.task('jshint', function() {
+  return gulp.src(paths.scripts.src)
+    .pipe($.jshint())
+    .pipe($.jshint.reporter($.jshintStylish));
+});
+
+gulp.task('traceur', function() {
+  var runtimePath = $.traceur.RUNTIME_PATH;
+  var filter = $.filter('!traceur-runtime.js');
+
+  return gulp.src([runtimePath, paths.scripts.src])
+    .pipe($.order([
+      'traceur-runtime.js',
+      paths.scripts.src
+      ]))
+      .pipe(filter)
+      .pipe($.traceur({
+        sourceMap: true
+      })
+      .pipe(filter.restore())
+      .pipe($.concat('app.js'))
+      .pipe($.insert.append('System.get("grendel" + "");'))
+      .pipe(gulp.dest(paths.scripts.build));
+});
+
+gulp.task('clean', function() {
+  return gulp.src([paths.dest.build, basePaths.deploy], {read: false})
+    .pipe($clean());
+}
+
+gulp.task('connect', function() {
+  var connect = require('connect');
+  var app = connect()
+    .use(require('connect-livereload')({
+      port: 35729
+    }))
+    .use(connect.static('.'))
+    .use(connect.directory('.'));
+
+    require('http').createServer(app)
+      .listen(3000)
+      .on('listening', function() {
+        console.log('Started connect web server on http://localhost:3000');
+      });
+});
+
+gulp.task('serve', [connect], function() {
+  require('opn')('http://localhost:3000');
+});
+
+gulp.task('watch', ['connect', 'serve'], function() {
+  var server = $livereload();
+
+  gulp.watch([
+    paths.html.src,
+    paths.styles.src,
+    paths.scripts.src
+    ]).on('change', function(file) {
+      server.changed(file.path);
+    });
+
+    gulp.watch([paths.styles.src], ['csslint']);
+    gulp.watch([paths.scripts.src], ['jshint', 'traceur'])
+});
+
+gulp.task('default', ['csslint', 'jshint', 'traceur', 'connect', 'watch']);
+
+/*
+var debug = require('gulp-debug');
 var watch = require('gulp-watch');
 var plumber = require('gulp-plumber');
 var stylus = require('gulp-stylus');
 var jshint = require('gulp-jshint');
+var concat = require('gulp-concat');
 var browserSync = require('browser-sync');
 var gutil = require('gulp-util');
 var reload = browserSync.reload;
 var traceur = require('gulp-traceur');
 var sourcemaps = require('gulp-sourcemaps');
+*/
+var basePaths = {
+  src: './client/app/',
+  deploy: './dist/public/',
+  build: './client/app/'
+}
 
+var paths = {
+  scripts: {
+     src: basePaths.src +  'components/**/*.js',
+     build: basePaths.build + 'scripts/',
+     dest: basePaths.dest + 'scripts/'
+  },
+  html: {
+    src: basePaths.src + 'html/',
+    dest: basePaths.dest + 'html/'
+  },
+  styles: {
+    src: basePaths.src + 'css/',
+    dest: basePaths.dest + 'css/'
+  },
+  images: {
+    src: basePaths.src + 'images/',
+    dest: basePaths.dest + 'images/'
+  }
+}
 
-var APP_SRC = './client/app';
-var APP_DEPLOY = './dist/public';
-
+/*
 var onError = function (err) {
   console.log(err);
   gutil.beep();
@@ -25,32 +128,18 @@ gulp.task('clean', function (cb) {
   rimraf('./dist', cb);
 });
 
-var paths = {
-  scriptsSrc: APP_SRC + '/scripts/*.js',
-  scriptsDest: APP_DEPLOY + '/scripts/',
-  htmlSrc: APP_SRC + '/html/index.html',
-  htmlDest: APP_DEPLOY,
-  stylesSrc: APP_SRC + '/styles/*.styl',
-  stylesDest: APP_DEPLOY + '/css/',
-  cssSrc: APP_SRC + '/css/*.css',
-  imagesSrc: APP_SRC + '/images/*',
-  imagesDest: APP_DEPLOY + '/images/',
-  partialsSrc: APP_SRC + '/partials/*.html',
-  partialsDest: APP_DEPLOY + '/partials/',
-  traceurSrc: APP_SRC + '/ecma6/*.js'
-}
 
 gulp.src('./bower_components/angularjs/angular.js')
-    .pipe(gulp.dest(APP_DEPLOY + '/js/'));
+    .pipe(gulp.dest(paths.scripts.dest));
 gulp.src('./bower_components/ui-router/release/angular-ui-router.js')
-    .pipe(gulp.dest(APP_DEPLOY + '/js/'));
+    .pipe(gulp.dest(paths.scripts.dest));
 gulp.src('./bower_components/ui-grid.js')
-    .pipe(gulp.dest(APP_DEPLOY + '/js'));
+    .pipe(gulp.dest(paths.scripts.dest));
 
 gulp.task('server', function() {
   browserSync({
     server: {
-      baseDir: APP_DEPLOY
+      baseDir: basePaths.deploy
     }
   });
 
@@ -58,86 +147,88 @@ gulp.task('server', function() {
   gulp.watch(paths.cssSrc, ['css']);
   gulp.watch(paths.imagesSrc, ['images']);
   gulp.watch(paths.htmlSrc, ['html']);
-  gulp.watch(paths.scriptsSrc, ['lint', 'traceur', 'scripts']);
+  gulp.watch(paths.scripts.src, ['traceur''lint', 'traceur', 'scripts', 'concat']);
   gulp.watch(paths.partialsSrc, ['partials']);
   gulp.watch(paths.traceurSrc, ['traceur'])
 });
 
 gulp.task('lint', function () {
-  return gulp.src(paths.scriptsSrc)
+  return gulp.src(paths.scripts.src)
     .pipe(plumber())
     .pipe(jshint())
     .pipe(jshint.reporter('default'));
 });
 
+gulp.task('traceur', function () {
+  console.log("Traceuring : " + paths.scripts.src);
+  return gulp.src(paths.scripts.src)
+  .pipe(sourcemaps.init())
+  .pipe(traceur())
+  .pipe(sourcemaps.write())
+  .pipe(gulp.dest(paths.scripts.build))
+});
+
 gulp.task('scripts', function() {
-  console.log("Scripting : " + paths.scriptsSrc);
-  return gulp.src(paths.scriptsSrc)
+  console.log("Scripting : " + paths.scripts.src);
+  return gulp.src(paths.scripts.src)
     .pipe(plumber({
       errorHandler: onError
     }))
-    .pipe(gulp.dest(paths.scriptsDest))
-    .pipe(reload({stream:true}));
+    .pipe(gulp.dest(paths.scripts.build));
+});
+
+gulp.task('concat', function() {
+  console.log("Concatting : " + paths.scripts.src);
+  return gulp.src(paths.scripts.build)
+  .pipe(plumber({
+    errorHandler: onError
+  }))
+  .pipe(gulp.dest(paths.scripts.dest))
+  .pipe(reload({stream:true}));
 });
 
 gulp.task('styles', function () {
-  console.log("Styling : " + paths.stylesSrc);
-  return gulp.src(paths.stylesSrc)
+  console.log("Styling : " + paths.styles.src);
+  return gulp.src(paths.styles.src)
     .pipe(plumber({
       errorHandler: onError
     }))
     .pipe(stylus())
-    .pipe(gulp.dest(paths.stylesDest))
+    .pipe(gulp.dest(paths.styles.dest))
     .pipe(reload({stream:true}));
 });
 
 gulp.task('css', function () {
-  console.log("CSSing : " + paths.cssSrc);
-  return gulp.src(paths.cssSrc)
+  console.log("CSSing : " + paths.styles.src);
+  return gulp.src(paths.styles.src)
     .pipe(plumber({
       errorHandler: onError
     }))
-    .pipe(gulp.dest(paths.stylesDest))
+    .pipe(gulp.dest(paths.styles.dest))
     .pipe(reload({stream:true}));
 });
 
 gulp.task('images', function () {
-  console.log("Imaging : " + paths.imagesSrc);
-  return gulp.src(paths.imagesSrc)
+  console.log("Imaging : " + paths.images.src);
+  return gulp.src(paths.images.src)
     .pipe(plumber({
       errorHandler: onError
     }))
-    .pipe(gulp.dest(paths.imagesDest))
+    .pipe(gulp.dest(paths.images.dest))
     .pipe(reload({stream:true}));
 });
 
 gulp.task('html', function() {
-  console.log("Initing : " + paths.htmlSrc);
-  return gulp.src(paths.htmlSrc)
+  console.log("Initing : " + paths.html.src);
+  return gulp.src(paths.html.src)
    .pipe(plumber({
       errorHandler: onError
     }))
-    .pipe(gulp.dest(paths.htmlDest))
+    .pipe(gulp.dest(paths.html.dest))
     .pipe(reload({stream:true}));
 });
 
-gulp.task('partials', function () {
-  console.log("Partialing : " + paths.partialsSrc);
-  return gulp.src(paths.partialsSrc)
-   .pipe(plumber({
-      errorHandler: onError
-    }))
-    .pipe(gulp.dest(paths.partialsDest))
-    .pipe(reload({stream:true}));
-});
 
-gulp.task('traceur', function () {
-  console.log("Traceuring : " + paths.traceurSrc);
-  return gulp.src(paths.traceurSrc)
-    .pipe(sourcemaps.init())
-    .pipe(traceur())
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest(paths.scriptsDest))
-});
 
-gulp.task('default', ['server', 'styles', 'css', 'lint', 'scripts', 'html', 'partials', 'images', 'traceur']);
+gulp.task('default', ['server', 'styles', 'css', 'lint', 'scripts', 'html', 'images', 'traceur']);
+*/
