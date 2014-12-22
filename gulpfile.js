@@ -101,7 +101,7 @@ gulp.task('webserver', function() {
 
 gulp.task('openbrowser', function() {
   var options = {
-    url: 'http://' + server.host + ':' + server.port + 'html/index.html'
+    url: 'http://' + server.host + ':' + server.port + '/index.html'
   }
 
   opn(options.url);
