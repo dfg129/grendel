@@ -42,7 +42,7 @@ angular.module('appModule', ['ui.router'])
     controller: function($scope) {
       $scope.things = ["A", "Set", "Of", "Things"];
     }
-  })
+  });
 
-    $urlRouterProvider.otherwise('/')
+    $urlRouterProvider.otherwise('/');
   });

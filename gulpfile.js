@@ -2,6 +2,7 @@
 
 var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
+var seq = require('run-sequence');
 var opn = require('opn');
 
 
@@ -14,12 +15,13 @@ var basePaths = {
   src: 'client/app/',
   assets: 'client/assets/',
   deploy: 'dist/public/',
-  build: 'client/app/'
+  build: 'client/app/',
+  external: 'client/bower_components/'
 }
 
 var paths = {
   scripts: {
-    src: basePaths.src +  'components/**/*.js',
+    src: basePaths.src +  '**/**/*.js',
     build: basePaths.build + 'scripts/',
     dest: basePaths.deploy + 'scripts/'
   },
@@ -34,6 +36,10 @@ var paths = {
   images: {
     src: basePaths.src + 'images/',
     dest: basePaths.deploy + 'images/'
+  },
+  external: {
+    src: basePaths.external,
+    dest: basePaths.deploy + 'js/'
   }
 }
 
@@ -62,13 +68,15 @@ gulp.task('traceur', function() {
       paths.scripts.src
       ]))
       .pipe(filter)
+      .pipe($.sourcemaps.init())
       .pipe($.traceur({
         sourceMap: true
       }))
+      .pipe($.sourcemaps.write(paths.scripts.dest))
       .pipe(filter.restore())
-      .pipe($.concat('app.js'))
+      .pipe($.concat('grendel.js'))
       .pipe($.insert.append('System.get("grendel" + "");'))
-      .pipe(gulp.dest(paths.scripts.build));
+      .pipe(gulp.dest(paths.scripts.dest));
 });
 
 gulp.task('javascript', function() {
@@ -79,7 +87,17 @@ gulp.task('javascript', function() {
     .pipe(gulp.dest(paths.scripts.dest));
 });
 
+gulp.task('external', function() {
+  gulp.src(paths.external.src + 'angularjs/angular.js')
+    .pipe(gulp.dest(paths.external.dest));
+  gulp.src(paths.external.src + 'ui-router/release/angular-ui-router.js')
+    .pipe(gulp.dest(paths.external.dest));
+});
+
 gulp.task('html', function() {
+  gulp.src(basePaths.src + "index.html")
+    .pipe(gulp.dest(basePaths.deploy));
+
   gulp.src(paths.html.src)
     .pipe(gulp.dest(paths.html.dest));
 })
@@ -94,25 +112,27 @@ gulp.task('webserver', function() {
     .pipe($.webserver({
       host: server.host,
       port: server.port,
-      livereload: true,
-      directoryListing: true
+      livereload: true
+    //  directoryListing: true
     }));
 });
 
 gulp.task('openbrowser', function() {
   var options = {
-    url: 'http://' + server.host + ':' + server.port + '/index.html'
+    url: 'http://' + server.host + ':' + server.port
   }
-
   opn(options.url);
 });
 
 
-gulp.task('watch', ['webserver', 'openbrowser'], function() {
+gulp.task('watch', function() {
     gulp.watch([paths.styles.src], ['csslint']);
     gulp.watch(paths.html.src, ['html']);
     gulp.watch([paths.scripts.src], ['jshint', 'traceur'])
 });
 
-
-gulp.task('default', ['css', 'html', 'jshint', 'traceur', 'javascript', 'webserver', 'watch', 'openbrowser']);
+gulp.task('build', function() {
+  seq('clean', ['css', 'html'], 'jshint', 'traceur',
+   'external', 'webserver', 'openbrowser', 'watch');
+})
+gulp.task('default', ['build']);
