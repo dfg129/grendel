@@ -92,6 +92,10 @@ gulp.task('external', function() {
     .pipe(gulp.dest(paths.external.dest));
   gulp.src(paths.external.src + 'ui-router/release/angular-ui-router.js')
     .pipe(gulp.dest(paths.external.dest));
+  gulp.src(paths.external.src + 'rxjs/dist/rx.lite.js')
+    .pipe(gulp.dest(paths.external.dest));
+    gulp.src(paths.external.src + 'angular-rx/dist/rx.angular.js')
+    .pipe(gulp.dest(paths.external.dest));
 });
 
 gulp.task('html', function() {

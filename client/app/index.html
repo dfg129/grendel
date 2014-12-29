@@ -1,8 +1,7 @@
+<!doctype html>
 <html ng-app="appModule">
 <head>
-  <script src="js/angular.js"></script>
-  <script src="./js/angular-ui-router.js"></script>
-  <script src="./scripts/grendel.js"> </script>
+
   <link rel="stylesheet" type="test/css" href="./css/main.css"
 </head>
 <body class="body">
@@ -12,7 +11,7 @@
 
   <nav class="nav">
 
-    <div class="nav-item nav1"><a ui-sref="state1">State 1</a></div>
+    <div class="nav-item nav1"><a ui-sref="reactive">Reactive</a></div>
     <div class="nav-item nav2"><a ui-sref="state2">State 2</a></div>
     <div class="nav-item nav3"><a ui-sref="state3">State 3</a></div>
   </nav>
@@ -27,5 +26,10 @@
 
 <footer class="footer">Footer</footer>
 
+<script src="js/angular.js"></script>
+<script src="js/angular-ui-router.js"></script>
+<script src="js/rx.lite.js"></script>
+<script src="js/rx.angular.js"></script>
+<script src="scripts/grendel.js"> </script>
 </body>
 </html>

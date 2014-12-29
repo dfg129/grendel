@@ -1,44 +1,44 @@
 // declare module
 
-angular.module('appModule', ['ui.router'])
+angular.module('appModule')
 .config(function($stateProvider, $urlRouterProvider) {
   $stateProvider
   .state('main', {
     url: "/main",
-    templateUrl: "./partials/main.html"
+    templateUrl: "./html/main/main.html"
   })
-  .state('state1', {
-    url: "/state1",
-    templateUrl: "./partials/state1.html",
-    controller: 'State1Controller'
+  .state('reactive', {
+    url: "/reactive",
+    templateUrl: "./html/reactive/reactive-main.html",
+    controller: 'RxJsController'
   })
   .state('state1.list', {
     url:"/list",
-    templateUrl:"./partials/state1.list.html",
+    templateUrl:"./html/state1/state1.list.html",
     controller: function($scope) {
       $scope.items = ["A", "List", "Of", "Items"];
     }
   })
   .state('state2', {
     url: "/state2",
-    templateUrl: "./partials/state2.html",
+    templateUrl: "./html/state2/state2.html",
     controller: 'State2Controller'
   })
   .state('state2.list', {
     url:"/list",
-    templateUrl:"./partials/state2.list.html",
+    templateUrl:"./html/state2/state2.list.html",
     controller: function($scope) {
       $scope.things = ["A", "Set", "Of", "Things"];
     }
   })
   .state('state3', {
     url: "/state3",
-    templateUrl: "./partials/state3.html",
+    templateUrl: "./html/state3/state3.html",
     controller: 'State3Controller'
   })
   .state('state3.list', {
     url:"/list",
-    templateUrl:"./partials/state3.list.html",
+    templateUrl:"./html/state3/state3.list.html",
     controller: function($scope) {
       $scope.things = ["A", "Set", "Of", "Things"];
     }
