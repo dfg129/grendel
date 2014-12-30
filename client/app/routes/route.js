@@ -10,7 +10,7 @@ angular.module('appModule')
   .state('reactive', {
     url: "/reactive",
     templateUrl: "./html/reactive/reactive-main.html",
-    controller: 'RxJsController'
+    controller: 'RxController'
   })
   .state('state1.list', {
     url:"/list",
