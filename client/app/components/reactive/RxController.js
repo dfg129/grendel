@@ -18,7 +18,7 @@ angular.module('appModule')
 
     var listen = function() {
      $rxService.listen(function(msg) { return true; }, function(msg) {
-       console.log(JSON.stringify(msg));
+       console.log("###Listening " + JSON.stringify(msg));
      });
    };
 
