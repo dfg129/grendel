@@ -14,7 +14,7 @@ var server = {
 var basePaths = {
   src: 'client/app/',
   assets: 'client/assets/',
-  deploy: 'dist/public/',
+  deploy: 'server/play-server/app/assets/',
   build: 'client/app/',
   external: 'client/bower_components/'
 }
@@ -23,7 +23,7 @@ var paths = {
   scripts: {
     src: basePaths.src +  '**/**/*.js',
     build: basePaths.build + 'scripts/',
-    dest: basePaths.deploy + 'scripts/'
+    dest: basePaths.deploy + 'javascript/'
   },
   html: {
     src: basePaths.src + 'components/**/*.html',
@@ -31,7 +31,7 @@ var paths = {
   },
   styles: {
     src: basePaths.assets + 'stylesheets/*.css',
-    dest: basePaths.deploy + 'css/'
+    dest: basePaths.deploy + 'stylesheets/'
   },
   images: {
     src: basePaths.src + 'images/',
@@ -39,7 +39,7 @@ var paths = {
   },
   external: {
     src: basePaths.external,
-    dest: basePaths.deploy + 'js/'
+    dest: basePaths.deploy + 'external/'
   }
 }
 
@@ -95,6 +95,8 @@ gulp.task('external', function() {
   gulp.src(paths.external.src + 'rxjs/dist/rx.lite.js')
     .pipe(gulp.dest(paths.external.dest));
     gulp.src(paths.external.src + 'angular-rx/dist/rx.angular.js')
+    .pipe(gulp.dest(paths.external.dest));
+    gulp.src(paths.external.src + 'angular-bootstrap/ui-bootstrap.js')
     .pipe(gulp.dest(paths.external.dest));
 });
 
