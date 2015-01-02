@@ -45,9 +45,7 @@ object Application extends Controller {
             Ok(toJson(Map("valid" -> false)))
           }
         }
-Logger.debug("failure")
         Ok(toJson(Map("valid" -> false)))
-
       }
       case _ => Ok(toJson(Map("valid" -> false)))
     }

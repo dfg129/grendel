@@ -10,6 +10,9 @@ import reactivemongo.core.commands._
 import play.api._
 import demo.models._
 import scala.util.{Success, Failure}
+import reactivemongo.bson._
+import play.modules.reactivemongo.json.BSONFormats._
+import play.api.libs.iteratee._
 
 
 object UserDAO {
@@ -30,14 +33,14 @@ object UserDAO {
   }
 
   def findOneByName(username: String): Future[Option[User]]  = {
-    Logger.debug("user = "  + username)
     val query = Json.obj("userName" -> username)
-    val col = collection.find(query).one[User]
-    col.onComplete {
-       case Success(u) => Logger.debug("col = " + u)
-       case Failure(t) => Logger.debug("col fail = " + t.getMessage)
-  }
-    col
+    val filter = Json.obj("userId" -> 1, "userName" -> 1, "password" -> 1)
+    collection.find(query, filter).one[User]
+//   col.onComplete {
+//       case Success(u) => Logger.debug("col = " + u)
+//     case Failure(t) => Logger.debug("col fail = " + t.getMessage)
+ //}
+//    col
   }
 
   def count: Future[Int] = {
