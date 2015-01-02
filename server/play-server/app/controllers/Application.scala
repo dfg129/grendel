@@ -76,5 +76,4 @@ Logger.debug("failure")
        Ok(Json.toJson(users))
     }
   }
-
 }

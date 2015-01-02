@@ -9,6 +9,7 @@ import reactivemongo.api._
 import reactivemongo.core.commands._
 import play.api._
 import demo.models._
+import scala.util.{Success, Failure}
 
 
 object UserDAO {
@@ -29,13 +30,17 @@ object UserDAO {
   }
 
   def findOneByName(username: String): Future[Option[User]]  = {
+    Logger.debug("user = "  + username)
     val query = Json.obj("userName" -> username)
     val col = collection.find(query).one[User]
-    Logger.debug("col - " + col.toString())
+    col.onComplete {
+       case Success(u) => Logger.debug("col = " + u)
+       case Failure(t) => Logger.debug("col fail = " + t.getMessage)
+  }
     col
   }
 
   def count: Future[Int] = {
-    ReactiveMongoPlugin.db.command(Count(collection.name))
+    db.command(Count(collection.name))
   }
 }
