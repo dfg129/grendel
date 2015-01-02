@@ -1,9 +1,13 @@
-package demo
+package demo.controllers
 
+import demo.models._
+import demo.services._
+import scala.concurrent.{Future}
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.json.Json.toJson
+import play.api.libs.concurrent.Execution.Implicits._
 
 
 
@@ -15,16 +19,24 @@ object Application extends Controller {
     Ok(views.html.index("Your new application is ready."))
   }
 
-  def login = Action(parse.json) { request =>
+  def login = Action(parse.json) { implicit request =>
 
     Logger.debug("Login action")
 
     implicit val loginRequest: Reads[LoginRequest] = Json.reads[LoginRequest]
 
     request.body.validate[LoginRequest] match {
-      case s: JsSuccess[LoginRequest] if (s.get.authenticate) => {
-        Ok(toJson(Map("valid" -> true))).withSession("user" -> s.get.username)
+      case loginRequest: JsSuccess[LoginRequest] => {
+        val username = loginRequest.get.user.map(_.userName)
+        val password = loginRequest.get.user.map(_.password)
+        Logger.debug("past the first check " + username)
+        if(username == loginRequest.get.username && password == loginRequest.get.password) {
+            Ok(toJson(Map("valid" -> true))).withSession("user" -> username.get)
+        }
+        else {
+          Forbidden("Invalid Login")
       }
+    }
       case _ => Ok(toJson(Map("valid" -> false)))
     }
   }
@@ -38,10 +50,27 @@ object Application extends Controller {
   }
 
   case class LoginRequest(username: String, password: String) {
-    Logger.debug(s"auth : $username , $password ")
-    val validUsers = Map("sysadmin" -> "password1", "root" -> "me")
+    val user = getUser(username)
+  }
 
-    def authenticate = validUsers.exists( _ == (username, password))
+  def getUser(username: String): Option[User] = {
+    Logger.debug("getUser : " + username)
+    val userResult = UserDAO.findOneByName(username)
+    Logger.debug(userResult.value.flatMap(_.toOption).toString)
+
+    for {
+      opt <- userResult.value.flatMap(_.toOption)
+      user <- opt
+    } yield user
+  }
+
+  def getUsers(page: Int, perPage: Int) = Action.async { implicit request =>
+    for {
+      count <- UserDAO.count
+      users <- UserDAO.findAll(1, 10)
+    } yield {
+       Ok(Json.toJson(users))
+    }
   }
 
 }

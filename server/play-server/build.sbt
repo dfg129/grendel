@@ -10,7 +10,7 @@ libraryDependencies ++= {
   val akkaV = "2.3.6"
   Seq(
     "com.typesafe.akka"   %%  "akka-actor"    % akkaV,
-    "org.reactivemongo" %% "reactivemongo" % "0.10.5.0.akka23" withSources()
+    "org.reactivemongo" %% "play2-reactivemongo" % "0.10.5.0.akka23"
   )
 }
 
