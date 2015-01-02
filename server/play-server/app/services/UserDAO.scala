@@ -30,7 +30,9 @@ object UserDAO {
 
   def findOneByName(username: String): Future[Option[User]]  = {
     val query = Json.obj("userName" -> username)
-    collection.find(query).one[User]
+    val col = collection.find(query).one[User]
+    Logger.debug("col - " + col.toString())
+    col
   }
 
   def count: Future[Int] = {
