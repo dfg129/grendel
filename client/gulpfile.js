@@ -4,7 +4,7 @@ var gulp = require('gulp');
 var $ = require('gulp-load-plugins')();
 var seq = require('run-sequence');
 var opn = require('opn');
-
+var del = require('del');
 
 var server = {
   host: 'localhost',
@@ -12,11 +12,11 @@ var server = {
 };
 
 var basePaths = {
-  src: 'client/app/',
-  assets: 'client/assets/',
-  deploy: 'server/play-server/app/assets/',
-  build: 'client/app/',
-  external: 'client/bower_components/'
+  src: 'app/',
+  assets: 'assets/',
+  deploy: '../server/play-server/app/assets/',
+  build: 'app/',
+  external: 'bower_components/'
 }
 
 var paths = {
@@ -27,7 +27,7 @@ var paths = {
   },
   html: {
     src: basePaths.src + 'components/**/*.html',
-    dest: basePaths.deploy + 'html/'
+    dest: basePaths.deploy + '../views/'
   },
   styles: {
     src: basePaths.assets + 'stylesheets/*.css',
@@ -45,10 +45,6 @@ var paths = {
 
 gulp.task('css', function() {
   return gulp.src(paths.styles.src)
-  //  .pipe($.csslint({
-  //    ids: false // allow ids in CSS selectors
-  //  }))
-  //  .pipe($.csslint.reporter())
     .pipe(gulp.dest(paths.styles.dest));
  });
 
@@ -92,25 +88,17 @@ gulp.task('external', function() {
     .pipe(gulp.dest(paths.external.dest));
   gulp.src(paths.external.src + 'ui-router/release/angular-ui-router.js')
     .pipe(gulp.dest(paths.external.dest));
-  gulp.src(paths.external.src + 'rxjs/dist/rx.lite.js')
-    .pipe(gulp.dest(paths.external.dest));
-    gulp.src(paths.external.src + 'angular-rx/dist/rx.angular.js')
-    .pipe(gulp.dest(paths.external.dest));
-    gulp.src(paths.external.src + 'angular-bootstrap/ui-bootstrap.js')
+  gulp.src(paths.external.src + 'angular-bootstrap/ui-bootstrap.js')
     .pipe(gulp.dest(paths.external.dest));
 });
 
 gulp.task('html', function() {
-  gulp.src(basePaths.src + "index.html")
-    .pipe(gulp.dest(basePaths.deploy));
-
   gulp.src(paths.html.src)
     .pipe(gulp.dest(paths.html.dest));
 })
 
 gulp.task('clean', function() {
-  return gulp.src([paths.scripts.build, basePaths.deploy], {read: false})
-    .pipe($.rimraf());
+  del([paths.scripts.build, basePaths.deploy], {read: false, force: true});
 });
 
 gulp.task('webserver', function() {
@@ -129,7 +117,6 @@ gulp.task('openbrowser', function() {
   }
   opn(options.url);
 });
-
 
 gulp.task('watch', function() {
     gulp.watch([paths.styles.src], ['csslint']);

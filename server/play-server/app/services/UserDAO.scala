@@ -36,11 +36,6 @@ object UserDAO {
     val query = Json.obj("userName" -> username)
     val filter = Json.obj("userId" -> 1, "userName" -> 1, "password" -> 1)
     collection.find(query, filter).one[User]
-//   col.onComplete {
-//       case Success(u) => Logger.debug("col = " + u)
-//     case Failure(t) => Logger.debug("col fail = " + t.getMessage)
- //}
-//    col
   }
 
   def count: Future[Int] = {

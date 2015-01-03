@@ -9,55 +9,59 @@ import play.api.libs.json._
 import play.api.libs.json.Json.toJson
 import play.api.libs.concurrent.Execution.Implicits._
 import scala.util.{Success, Failure}
+import play.api.libs.iteratee.Enumerator
+import scala.concurrent.duration._
 
 
 object Application extends Controller {
 
-  def index = Action {
-    Logger.debug("Starting the app")
-
-    Ok(views.html.index("Your new application is ready."))
+  def index = Action { implicit request =>
+    request.session.get("user").map { user =>
+      Logger.debug("user = " + user)
+      Redirect(routes.Application.main())
+    }.getOrElse {
+      Logger.debug("or else")
+      Redirect(routes.Application.authenticate())
+    }
   }
 
-  def login = Action(parse.json) { implicit request =>
+  def authenticate = Action { implicit request =>
+      Ok(views.html.login.authentication())
+  }
 
-    Logger.debug("Login action")
-
+  def login = Action.async(parse.json) { implicit request =>
     implicit val loginRequest: Reads[LoginRequest] = Json.reads[LoginRequest]
 
     request.body.validate[LoginRequest] match {
       case loginRequest: JsSuccess[LoginRequest] => {
         val userResult: Future[Option[User]] = getUser(loginRequest.get.username)
-        userResult.onComplete {
-          case Success(user) => {
-            Logger.debug("Found user :")
-            if(user.get.userName == loginRequest.get.username && user.get.password == loginRequest.get.password) {
-             Logger.debug("Success !")
-              Ok(toJson(Map("valid" -> true))).withSession("user" -> user.get.userName)
+        val timeout = play.api.libs.concurrent.Promise.timeout("wait no more", 10.second)
+
+        Future.firstCompletedOf(Seq(userResult, timeout)).map {
+          case user: Option[User] => {
+            if(user.exists(_.password == loginRequest.get.password)) {
+              Ok(toJson(Map("valid" -> true)))
             }
             else {
-              Logger.debug("invalid")
               Forbidden("Invalid Login")
             }
           }
-          case Failure(ex) => {
-            Logger.debug("ex failure " + ex.getMessage)
-            Ok(toJson(Map("valid" -> false)))
-          }
+          case timeout: String => InternalServerError(timeout)
         }
-        Ok(toJson(Map("valid" -> false)))
       }
-      case _ => Ok(toJson(Map("valid" -> false)))
+      case JsError(_) => {
+        val futureRes = scala.concurrent.Future{}
+        futureRes.map(_ => Ok(toJson(Map("valid" -> false))))
+      }
     }
   }
 
-
-  def welcome = Action { implicit request =>
-      request.session.get("user").map (
-        user => {
-          Ok(views.html.overview(user))
-        }
-      ).getOrElse(Redirect(routes.Application.index()))
+  def main = Action { implicit request =>
+      request.session.get("user").map { user =>
+          Ok(views.html.main.summary())
+      }.getOrElse {
+          Unauthorized("Access denied")
+      }
   }
 
   case class LoginRequest(username: String, password: String)
