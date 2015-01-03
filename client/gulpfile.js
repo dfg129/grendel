@@ -29,6 +29,10 @@ var paths = {
     src: basePaths.src + 'components/**/*.html',
     dest: basePaths.deploy + '../views/'
   },
+  partials: {
+    src: basePaths.assets + 'partials/*.html',
+    dest: basePaths.deploy + 'partials/'
+  },
   styles: {
     src: basePaths.assets + 'stylesheets/*.css',
     dest: basePaths.deploy + 'stylesheets/'
@@ -46,6 +50,11 @@ var paths = {
 gulp.task('css', function() {
   return gulp.src(paths.styles.src)
     .pipe(gulp.dest(paths.styles.dest));
+ });
+
+ gulp.task('partials', function() {
+   return gulp.src(paths.partials.src)
+   .pipe(gulp.dest(paths.partials.dest));
  });
 
 gulp.task('jshint', function() {
@@ -86,7 +95,7 @@ gulp.task('javascript', function() {
 gulp.task('external', function() {
   gulp.src(paths.external.src + 'angularjs/angular.js')
     .pipe(gulp.dest(paths.external.dest));
-  gulp.src(paths.external.src + 'ui-router/release/angular-ui-router.js')
+  gulp.src(paths.external.src + 'angular-route/angular-route.js')
     .pipe(gulp.dest(paths.external.dest));
   gulp.src(paths.external.src + 'angular-bootstrap/ui-bootstrap.js')
     .pipe(gulp.dest(paths.external.dest));
@@ -125,7 +134,7 @@ gulp.task('watch', function() {
 });
 
 gulp.task('build', function() {
-  seq('clean', ['css', 'html'], 'jshint', 'traceur',
-   'external', 'webserver', 'openbrowser', 'watch');
+  seq('clean', ['css', 'html', 'partials'], 'jshint', 'traceur',
+   'external', 'watch'); //   'webserver', 'openbrowser', 'watch');
 })
 gulp.task('default', ['build']);
