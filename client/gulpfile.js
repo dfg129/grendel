@@ -99,6 +99,8 @@ gulp.task('external', function() {
     .pipe(gulp.dest(paths.external.dest));
   gulp.src(paths.external.src + 'angular-bootstrap/ui-bootstrap.js')
     .pipe(gulp.dest(paths.external.dest));
+  gulp.src(paths.external.src + 'angular-ui-grid/ui-grid.js')
+    .pipe(gulp.dest(paths.external.dest));
 });
 
 gulp.task('html', function() {
@@ -128,7 +130,7 @@ gulp.task('openbrowser', function() {
 });
 
 gulp.task('watch', function() {
-    gulp.watch([paths.styles.src], ['csslint']);
+    gulp.watch([paths.styles.src], ['css']);
     gulp.watch(paths.html.src, ['html']);
     gulp.watch([paths.scripts.src], ['jshint', 'traceur'])
 });

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+
+<html ng-app="app">
+    <head>
+        <title>Auth</title>
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+        <base href="/">
+    </head>
+    <body >
+        <h1>Here in the Western World </h1>
+        <form name="login" ng-controller="LoginController as lg" ng-submit="lg.login(lg.data)" novalidate>
+            <label for="username">Username:</label>
+            <input type="text" id="username" ng-model="lg.data.username" autofocus>
+            <label for="password">Password:</label>
+            <input type="text" id="password" ng-model="lg.data.password">
+            <button type="submit">Login</button>
+        </form>
+      <div>
+  
+        <script src="@routes.Assets.at("external/angular.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("external/angular-route.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("external/ui-bootstrap.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("external/ui-grid.js")" type="text/javascript"></script>
+        <script src="@routes.Assets.at("javascript/grendel.js")" type="text/javascript"></script>
+    </body>
+</html>
