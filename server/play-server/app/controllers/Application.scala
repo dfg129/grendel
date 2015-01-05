@@ -14,7 +14,6 @@ import scala.concurrent.duration._
 
 
 object Application extends Controller {
-  val timeout = play.api.libs.concurrent.Promise.timeout("Database error. Please contact your admin", 60.second)
 
   def index = Action { implicit request =>
     request.session.get("user").map { user =>
@@ -28,7 +27,6 @@ object Application extends Controller {
   }
 
   def summary = Action { implicit request =>
-    Logger.debug("summary")
     Ok(views.html.main.summary())
   }
 
@@ -58,7 +56,6 @@ object Application extends Controller {
 
   def count = Action.async { implicit request => {
       val totalResult: Future[Int] = InstanceDAO.count
-
       totalResult.map (
         count => {
             Ok(toJson(Map("total" -> count)))

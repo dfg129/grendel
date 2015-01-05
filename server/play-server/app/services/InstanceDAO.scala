@@ -14,26 +14,22 @@ import reactivemongo.bson._
 import play.modules.reactivemongo.json.BSONFormats._
 import play.api.libs.iteratee._
 
-
 object InstanceDAO {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   val driver = new MongoDriver
+  // add to a config object
   val connection = driver.connection(List("localhost:27017"))
   val db = connection("cloud")
   val collection = db.collection[JSONCollection]("instances")
 
 
   def findAll(page: Int, perPage: Int): Future[Seq[Instance]] = {
-    val c = collection.find(Json.obj())
+    collection.find(Json.obj())
     .options(QueryOpts((page - 1) * perPage))
     .sort(Json.obj("_id" -> -1))
     .cursor[Instance]
     .collect[Seq](perPage)
-    c.onSuccess {
-      case x => Logger.debug((x.length).toString())
-    }
-    c
   }
 
 

@@ -15,17 +15,4 @@ angular.module("app").service('AuthorizationService', function($http, Session) {
   };
 
   return service;
-})
-.service('Session', function() {
-  this.create = function(sessionId, userId, userName) {
-    this.id = sessionId;
-    this.userId = userId;
-    this.userName = userName;
-  };
-
-  this.destroy = function() {
-    this.id = null;
-    this.userId = null;
-    this.userName = null;
-  };
 });
