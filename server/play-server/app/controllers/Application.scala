@@ -17,17 +17,18 @@ object Application extends Controller {
 
   def index = Action { implicit request =>
     request.session.get("user").map { user =>
-      Logger.debug("user = " + user)
-      Logger.debug("where is my nonce")
       Ok(views.html.main.summary())
     }.getOrElse {
-      Logger.debug("or else")
      Redirect(routes.Login.authenticate())
     }
   }
 
   def summary = Action { implicit request =>
-    Ok(views.html.main.summary())
+    request.session.get("user").map { user =>
+      Ok(views.html.main.summary())
+    }.getOrElse {
+      Redirect(routes.Login.authenticate())
+    }
   }
 
   def instances(page: Int, size: Int) = Action.async { implicit request =>

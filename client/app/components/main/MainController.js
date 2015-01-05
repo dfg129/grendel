@@ -13,12 +13,12 @@ angular.module('app')
 
     var columnDefs = [
       {field: "name", name: "Name"},
-      {field: "id", name: "id"},
-      {field: "itype", name: "Type"},
-      {field: "state", name: "State"},
-      {field: "az", name: "Az"},
-      {field: "publicIP", name: "Public Address"},
-      {field: "privateIP", name: "Private Address"}
+    {field: "id", name: "Instance ID"},
+  {field: "itype", name: "Instance Type"},
+{field: "state", name: "Instance State"},
+      {field: "az", name: "Availability Zone"},
+    {field: "publicIP", name: "Public IP"},
+  {field: "privateIP", name: "Private IP"}
     ];
 
     $timeout( function() {
