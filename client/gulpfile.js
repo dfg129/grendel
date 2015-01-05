@@ -34,7 +34,7 @@ var paths = {
     dest: basePaths.deploy + 'partials/'
   },
   styles: {
-    src: basePaths.assets + 'stylesheets/*.css',
+    src: basePaths.assets + 'stylesheets/*.*',
     dest: basePaths.deploy + 'stylesheets/'
   },
   images: {
@@ -98,6 +98,8 @@ gulp.task('external', function() {
   gulp.src(paths.external.src + 'angular-route/angular-route.js')
     .pipe(gulp.dest(paths.external.dest));
   gulp.src(paths.external.src + 'angular-bootstrap/ui-bootstrap.js')
+    .pipe(gulp.dest(paths.external.dest));
+    gulp.src(paths.external.src + 'angular-bootstrap/ui-bootstrap-tpls.js')
     .pipe(gulp.dest(paths.external.dest));
   gulp.src(paths.external.src + 'angular-ui-grid/ui-grid.js')
     .pipe(gulp.dest(paths.external.dest));

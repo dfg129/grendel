@@ -11,7 +11,7 @@ GET     /summary                    demo.controllers.Application.summary
 
 POST    /login                      demo.controllers.Login.login
 
-GET    /instances                   demo.controllers.Application.instances
+GET    /instances                   demo.controllers.Application.instances(page: Int ?= 1, size: Int ?= 10)
 
 # Map static resources from the /public folder to the /assets URL path
 GET     /assets/*file               controllers.Assets.at(path="/public", file)

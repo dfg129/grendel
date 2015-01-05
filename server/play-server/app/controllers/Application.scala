@@ -31,18 +31,25 @@ object Application extends Controller {
     Ok(views.html.main.summary())
   }
 
-  def instances = Action.async { implicit request =>
-    Logger.debug("instances")
+  def instances(page: Int, size: Int) = Action.async { implicit request =>
+    Logger.debug(s"instances : $page : $size")
 
-    val instanceResult: Future[Seq[Instance]] = InstanceDAO.findAll(1, 10)
+    val instanceResult: Future[Seq[Instance]] = InstanceDAO.findAll(page, size)
     val timeout = play.api.libs.concurrent.Promise.timeout("Please contact admin", 10.second)
 
     Future.firstCompletedOf(Seq(instanceResult, timeout)).map {
       case instances: Seq[Instance] => {
-        Logger.debug(Json.prettyPrint(Json.toJson(instances)))
+        //Logger.debug(Json.prettyPrint(Json.toJson(instances)))
         Ok(toJson(
             instances.map { i =>
-                Map("name" -> i.name, "id" -> i.id)
+                Map("name" -> i.name,
+                    "id" -> i.id,
+                    "itype" -> i.itype,
+                    "state" -> i.state,
+                    "az" -> i.az,
+                    "publicIP" -> i.publicIP,
+                    "privateIP" -> i.privateIP
+                    )
             }
           ))
       }
