@@ -138,7 +138,7 @@ gulp.task('watch', function() {
 });
 
 gulp.task('build', function() {
-  seq('clean', ['css', 'html', 'partials'], 'jshint', 'traceur',
+  seq('clean', ['css', 'html'], 'jshint', 'traceur',
    'external', 'watch'); //   'webserver', 'openbrowser', 'watch');
 })
 gulp.task('default', ['build']);
