@@ -25,11 +25,15 @@ object InstanceDAO {
 
 
   def findAll(page: Int, perPage: Int): Future[Seq[Instance]] = {
-    collection.find(Json.obj())
+    val c = collection.find(Json.obj())
     .options(QueryOpts((page - 1) * perPage))
     .sort(Json.obj("_id" -> -1))
     .cursor[Instance]
     .collect[Seq](perPage)
+    c.onSuccess {
+      case x => Logger.debug((x.length).toString())
+    }
+    c
   }
 
 

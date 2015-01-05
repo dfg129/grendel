@@ -1,18 +1,24 @@
 angular.module('app')
-.controller('PageController', function ($scope, $log, PageService) {
-  $scope.totalItems = 64;
+.controller('PageController', function ($scope, $log, $timeout, PageService) {
+
   $scope.currentPage = 1;
+  $scope.totalItems  = 40;
+
+/*
+ PageService.count(function(data) {
+     $scope.totalItems = data;
+  });
+*/
 
   $scope.setPage = function (pageNo) {
     $scope.currentPage = pageNo;
   };
 
   $scope.pageChanged = function() {
-    console.log('Page changed to: ' + $scope.currentPage);
     PageService.changePage($scope.currentPage);
   };
 })
-.service("PageService", function($rootScope) {
+.service("PageService", function($rootScope, $http) {
     var pageService = {};
     pageService.page = 1;
 
@@ -21,5 +27,14 @@ angular.module('app')
       $rootScope.$broadcast("pageChange");
     };
 
+    pageService.count = function(cb) {
+        $http.get('/count')
+        .success(function(data) {
+          cb(data);
+        })
+        .error(function() {
+          console.log("error in data");
+        });
+      };
     return pageService;
 });

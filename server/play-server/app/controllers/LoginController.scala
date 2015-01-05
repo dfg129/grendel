@@ -54,12 +54,4 @@ object Login extends Controller {
     UserDAO.findOneByName(username)
   }
 
-  def getUsers(page: Int, perPage: Int) = Action.async { implicit request =>
-    for {
-      count <- UserDAO.count
-      users <- UserDAO.findAll(1, 10)
-    } yield {
-      Ok(Json.toJson(users))
-    }
-  }
 }

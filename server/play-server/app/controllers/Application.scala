@@ -14,6 +14,7 @@ import scala.concurrent.duration._
 
 
 object Application extends Controller {
+  val timeout = play.api.libs.concurrent.Promise.timeout("Database error. Please contact your admin", 60.second)
 
   def index = Action { implicit request =>
     request.session.get("user").map { user =>
@@ -35,25 +36,34 @@ object Application extends Controller {
     Logger.debug(s"instances : $page : $size")
 
     val instanceResult: Future[Seq[Instance]] = InstanceDAO.findAll(page, size)
-    val timeout = play.api.libs.concurrent.Promise.timeout("Please contact admin", 10.second)
 
-    Future.firstCompletedOf(Seq(instanceResult, timeout)).map {
-      case instances: Seq[Instance] => {
-        //Logger.debug(Json.prettyPrint(Json.toJson(instances)))
-        Ok(toJson(
-            instances.map { i =>
-                Map("name" -> i.name,
-                    "id" -> i.id,
-                    "itype" -> i.itype,
-                    "state" -> i.state,
-                    "az" -> i.az,
-                    "publicIP" -> i.publicIP,
-                    "privateIP" -> i.privateIP
+      // this is an opportunity to abstract mapping from the data storage,
+      // if not needed then you would handle mapping implicitly in the service to support a nosql document store
+     instanceResult.map (
+       instances =>  {
+          Ok(toJson(
+            instances.map { instance =>
+                Map("name" -> instance.name,
+                    "id" -> instance.id,
+                    "itype" -> instance.itype,
+                    "state" -> instance.state,
+                    "az" -> instance.az,
+                    "publicIP" -> instance.publicIP,
+                    "privateIP" -> instance.privateIP
                     )
-            }
-          ))
-      }
-      case timeout: String => InternalServerError(timeout)
+            })
+          )
+      })
+  }
+
+  def count = Action.async { implicit request => {
+      val totalResult: Future[Int] = InstanceDAO.count
+
+      totalResult.map (
+        count => {
+            Ok(toJson(Map("total" -> count)))
+          }
+      )
     }
   }
 }
