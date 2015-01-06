@@ -14,31 +14,29 @@ import reactivemongo.bson._
 import play.modules.reactivemongo.json.BSONFormats._
 import play.api.libs.iteratee._
 
-
+/**
+ * Service to retrieve a demo.models.User from the database
+ */
 object UserDAO {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   val driver = new MongoDriver
-  val connection = driver.connection(List("localhost:27017"))
-  val db = connection("auth")
-  val collection = db.collection[JSONCollection]("users")
 
+  // pull config info from application.conf
+  // host and port
+  val connection = driver.connection(List(Play.current.configuration.getString("db.driver").getOrElse("Could not retrieve db")))
+  // database
+  val db = connection(Play.current.configuration.getString("db.auth").getOrElse("auth not found"))
+  // collection
+  val collection = db.collection[JSONCollection](Play.current.configuration.getString("db.users").getOrElse("users not found"))
 
- def findAll(page: Int, perPage: Int): Future[Seq[User]] = {
-    collection.find(Json.obj())
-      .options(QueryOpts(page * perPage))
-      .sort(Json.obj("_id" -> -1))
-      .cursor[User]
-      .collect[Seq](perPage)
-  }
-
+  /**
+   * Find a user by name
+   * @param name of the user
+   */
   def findOneByName(username: String): Future[Option[User]]  = {
     val query = Json.obj("userName" -> username)
     val filter = Json.obj("userId" -> 1, "userName" -> 1, "password" -> 1)
     collection.find(query, filter).one[User]
-  }
-
-  def count: Future[Int] = {
-    db.command(Count(collection.name))
   }
 }

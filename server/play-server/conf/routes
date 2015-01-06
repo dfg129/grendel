@@ -5,14 +5,19 @@
 # Home page
 GET     /                           demo.controllers.Application.index
 
+# Page with the user and password inputs
 GET     /authenticate               demo.controllers.Login.authenticate
 
+# Page with the table
 GET     /summary                    demo.controllers.Application.summary
 
+# REST post to login
 POST    /login                      demo.controllers.Login.login
 
+# REST request to get instances - contains query parameters for page index and size
 GET    /instances                   demo.controllers.Application.instances(page: Int ?= 1, size: Int ?= 10)
 
+# REST request to get total number
 GET    /count                       demo.controllers.Application.count
 
 # Map static resources from the /public folder to the /assets URL path

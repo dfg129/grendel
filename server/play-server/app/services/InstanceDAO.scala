@@ -14,16 +14,27 @@ import reactivemongo.bson._
 import play.modules.reactivemongo.json.BSONFormats._
 import play.api.libs.iteratee._
 
+/**
+ * Service object used to access stored data in the form of demo.models.InstanceModel
+ */
 object InstanceDAO {
   import scala.concurrent.ExecutionContext.Implicits.global
 
   val driver = new MongoDriver
-  // add to a config object
-  val connection = driver.connection(List("localhost:27017"))
-  val db = connection("cloud")
-  val collection = db.collection[JSONCollection]("instances")
 
+  // pull config info from application.conf
+  // host and port
+  val connection = driver.connection(List(Play.current.configuration.getString("db.driver").getOrElse("Could not retrieve db")))
+  // database
+  val db = connection(Play.current.configuration.getString("db.instance").getOrElse("instance not found"))
+  // collection
+  val collection = db.collection[JSONCollection](Play.current.configuration.getString("db.collection").getOrElse("collection not found"))
 
+  /**
+   * Find all instances
+   * @param page starting index
+   * @param perPage page size
+   */
   def findAll(page: Int, perPage: Int): Future[Seq[Instance]] = {
     collection.find(Json.obj())
     .options(QueryOpts((page - 1) * perPage))
@@ -32,7 +43,9 @@ object InstanceDAO {
     .collect[Seq](perPage)
   }
 
-
+  /**
+   * Return a count of all instances
+   */
   def count: Future[Int] = {
     db.command(Count(collection.name))
   }

@@ -16,7 +16,8 @@ var basePaths = {
   assets: 'assets/',
   deploy: '../server/play-server/app/assets/',
   build: 'app/',
-  external: 'bower_components/'
+  external: 'bower_components/',
+  dist: 'dist'
 }
 
 var paths = {
@@ -81,7 +82,8 @@ gulp.task('traceur', function() {
       .pipe(filter.restore())
       .pipe($.concat('grendel.js'))
       .pipe($.insert.append('System.get("grendel" + "");'))
-      .pipe(gulp.dest(paths.scripts.dest));
+      .pipe(gulp.dest(paths.scripts.dest))
+      .pipe(gulp.dest(basePaths.dist));
 });
 
 gulp.task('javascript', function() {

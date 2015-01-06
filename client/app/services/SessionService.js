@@ -1,3 +1,7 @@
+
+/**
+ * Use a session service to track features that are available to the user.
+ */
 angular.module('app')
   .service('Session', function() {
     session = {};
